@@ -1,0 +1,23 @@
+{
+  "name": "zaintza-soc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Panel local de análisis de eventos de seguridad de Windows con detección de fallos de autenticación repetidos.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server": "node server/server.cjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.2.0",
+    "vite": "^8.3.4"
+  }
+}

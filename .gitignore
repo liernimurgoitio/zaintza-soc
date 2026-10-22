@@ -1,0 +1,22 @@
+# Dependencias
+/node_modules
+
+# Compilación
+/dist
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Datos locales de investigación (estados y notas)
+/server/data/
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.claude/
+
+# Registros
+npm-debug.log*

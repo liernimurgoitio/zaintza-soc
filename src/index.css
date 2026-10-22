@@ -1,0 +1,7 @@
+body {
+  margin: 0;
+  padding: clamp(12px, 2vw, 24px);
+  background: #060a14;
+  color: #edf2fa;
+  font-family: Inter, system-ui, sans-serif;
+}
