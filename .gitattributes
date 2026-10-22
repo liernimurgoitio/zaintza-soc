@@ -1,0 +1,9 @@
+# Normaliza los saltos de línea en el repositorio
+* text=auto eol=lf
+
+# Los scripts de PowerShell se mantienen con saltos de línea de Windows
+*.ps1 text eol=crlf
+
+# Archivos binarios
+*.webp binary
+*.ico binary
