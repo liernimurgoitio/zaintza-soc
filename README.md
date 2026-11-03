@@ -47,7 +47,7 @@ Registro Seguridad de Windows
 server/read-events.ps1      Lector PowerShell → JSON
         │
         ▼
-server/server.js            API local Express en 127.0.0.1:3001
+server/server.js            API local Express en 127.0.0.1:3101
 src/detection/rules.js      Reglas ZAINTZA-AUTH-001 y ZAINTZA-AUTH-002
         │  /api/events
         ▼
@@ -109,8 +109,8 @@ npm run server
 ```
 
 El servicio escucha únicamente en la dirección local
-http://127.0.0.1:3001 y la consulta de eventos está en
-http://127.0.0.1:3001/api/events
+http://127.0.0.1:3101 y la consulta de eventos está en
+http://127.0.0.1:3101/api/events
 
 Ejecuta el lector PowerShell con RemoteSigned solo para ese proceso,
 sin modificar la política permanente de ejecución del equipo.

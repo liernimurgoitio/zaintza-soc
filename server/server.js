@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const host = "127.0.0.1";
-const port = 3001;
+const port = 3101;
 
 const dataDirectory = path.join(__dirname, "data");
 const statesPath = path.join(dataDirectory, "states.json");
