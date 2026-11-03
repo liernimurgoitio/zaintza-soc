@@ -5,8 +5,8 @@ export default defineConfig({
   plugins: [react()],
 
   server: {
-    // El servicio local solo admite el origen localhost:5173.
-    port: 5173,
+    // El servicio local solo admite el origen localhost:5273.
+    port: 5273,
     strictPort: true,
     proxy: {
       "/api": {

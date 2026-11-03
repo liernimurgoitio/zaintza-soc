@@ -51,7 +51,7 @@ server/server.js            API local Express en 127.0.0.1:3101
 src/detection/rules.js      Reglas ZAINTZA-AUTH-001 y ZAINTZA-AUTH-002
         │  /api/events
         ▼
-src/ (React + Vite)         Panel de investigación en localhost:5173
+src/ (React + Vite)         Panel de investigación en localhost:5273
 ```
 
 ## Tecnologías
@@ -91,7 +91,7 @@ en GitHub Actions con cada subida.
 npm run dev
 ```
 
-Abre http://localhost:5173/?mode=demo
+Abre http://localhost:5273/?mode=demo
 
 La demo utiliza datos ficticios, no consulta Windows y reinicia
 los estados al recargar la página.
@@ -121,11 +121,11 @@ sin modificar la política permanente de ejecución del equipo.
 npm run dev
 ```
 
-Abre http://localhost:5173
+Abre http://localhost:5273
 
 Vite redirige las peticiones `/api` al servicio local.
 El servicio solo acepta peticiones de guardado desde
-`localhost:5173` o `127.0.0.1:5173`.
+`localhost:5273` o `127.0.0.1:5273`.
 
 ### Detener los servicios
 
@@ -194,7 +194,7 @@ Para contrastar un evento:
 - Si el navegador no conecta, comprueba que Vite está iniciado.
 - Si falla `/api/events`, comprueba que el servicio está iniciado
   y tiene permisos para leer el registro Seguridad.
-- Si el estado no se guarda, comprueba que Vite usa el puerto 5173.
+- Si el estado no se guarda, comprueba que Vite usa el puerto 5273.
 - Si falla una actualización, el panel conserva la última lectura
   correcta y avisa de que puede estar desactualizada.
 
