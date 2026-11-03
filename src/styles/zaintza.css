@@ -497,6 +497,20 @@
   color: #fed7aa;
 }
 
+.zaintza .z-evidence + .z-evidence {
+  margin-top: 12px;
+}
+
+.zaintza .z-evidence a {
+  color: #fed7aa;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.zaintza .z-evidence a:hover {
+  color: #ffedd5;
+}
+
 .zaintza .z-evidence details {
   margin: 16px 0 12px;
   font-size: 12px;

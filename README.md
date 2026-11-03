@@ -1,8 +1,10 @@
 # Zaintza SOC
 
+[![Tests](https://github.com/liernimurgoitio/zaintza-soc/actions/workflows/ci.yml/badge.svg)](https://github.com/liernimurgoitio/zaintza-soc/actions/workflows/ci.yml)
+
 Panel local de análisis de eventos de seguridad de Windows.
 Recoge fallos de inicio de sesión (EventID 4625) mediante PowerShell,
-detecta fallos de autenticación repetidos y permite seguir su investigación.
+detecta fuerza bruta y *password spraying* y permite seguir su investigación.
 
 ![Panel de Zaintza SOC](docs/captura.webp)
 
@@ -17,14 +19,20 @@ detecta fallos de autenticación repetidos y permite seguir su investigación.
 - Lectura de hasta 100 eventos recientes de tipo 4625:
   fallos de inicio de sesión.
 - Actualización automática cada 30 segundos.
-- Búsqueda por cuenta, equipo, IP e identificador.
+- Dos reglas de detección asociadas a MITRE ATT&CK (ver [Reglas](#reglas-de-detección)).
+- Motivo del fallo traducido a partir de los códigos `Status` y `SubStatus`
+  (por ejemplo, «contraseña incorrecta» o «la cuenta no existe»)
+  y tipo de inicio de sesión explicado (red, RDP, interactivo…).
+- Búsqueda por cuenta, equipo, IP, identificador, regla o técnica MITRE.
 - Filtros por prioridad y estado.
-- Detalle del evento y de las evidencias de detección.
+- Detalle del evento y de las evidencias de cada detección.
 - Estados Nueva, En investigación y Resuelta.
 - Notas del analista y motivo de cierre.
 - Persistencia local de los estados de investigación.
 - Modo privacidad para ocultar cuentas, equipos e IP en pantalla.
-- Modo demo con un escenario ficticio, sin acceso a Windows.
+- Modo demo con escenarios ficticios de las dos reglas, sin acceso a Windows.
+  La demo usa las mismas reglas que el servicio real.
+- Tests automáticos de las reglas en cada subida a GitHub.
 
 El panel muestra eventos reales obtenidos del equipo donde se ejecuta
 el servicio. Una detección requiere investigación y no confirma
@@ -39,8 +47,8 @@ Registro Seguridad de Windows
 server/read-events.ps1      Lector PowerShell → JSON
         │
         ▼
-server/server.cjs           API local Express en 127.0.0.1:3001
-server/detect-events.cjs    Regla ZAINTZA-AUTH-001
+server/server.js            API local Express en 127.0.0.1:3001
+src/detection/rules.js      Reglas ZAINTZA-AUTH-001 y ZAINTZA-AUTH-002
         │  /api/events
         ▼
 src/ (React + Vite)         Panel de investigación en localhost:5173
@@ -51,6 +59,7 @@ src/ (React + Vite)         Panel de investigación en localhost:5173
 - React 19, React Router 7 y Vite 8.
 - Node.js y Express 5.
 - Windows PowerShell.
+- `node:test` y GitHub Actions para los tests.
 
 ## Requisitos
 
@@ -64,6 +73,17 @@ src/ (React + Vite)         Panel de investigación en localhost:5173
 ```bash
 npm ci
 ```
+
+## Tests
+
+```bash
+npm test
+```
+
+Comprueban las dos reglas (umbral, ventana de tiempo, agrupación,
+casos que no deben detectarse), la traducción de los códigos de Windows
+y que la demo incluye un ejemplo de cada regla. Se ejecutan también
+en GitHub Actions con cada subida.
 
 ## Probar la demo
 
@@ -122,28 +142,29 @@ powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\server\read-even
 Debe devolver una lista JSON. Si no existen eventos coincidentes,
 devuelve una lista vacía.
 
-## Regla ZAINTZA-AUTH-001
+## Reglas de detección
 
-Detecta cinco o más fallos relacionados en una ventana de cinco minutos.
+| Regla | Detecta | Umbral | Agrupa por | MITRE ATT&CK |
+|---|---|---|---|---|
+| ZAINTZA-AUTH-001 | Fallos de autenticación repetidos (fuerza bruta) | 5 fallos en 5 minutos | Equipo, cuenta, IP y tipo de acceso | [T1110.001 Password Guessing](https://attack.mitre.org/techniques/T1110/001/) |
+| ZAINTZA-AUTH-002 | Posible *password spraying* | 5 cuentas distintas en 5 minutos | Equipo e IP de origen | [T1110.003 Password Spraying](https://attack.mitre.org/techniques/T1110/003/) |
 
-Agrupa los eventos por:
+- **AUTH-001** señala muchos intentos contra una misma cuenta:
+  alguien intenta adivinar su contraseña, o un servicio usa una contraseña
+  antigua guardada.
+- **AUTH-002** señala una misma IP que prueba muchas cuentas distintas,
+  normalmente con pocas contraseñas comunes para no provocar bloqueos.
 
-- Equipo.
-- Cuenta afectada.
-- IP de origen.
-- Tipo de inicio de sesión.
-
-El evento que alcanza o supera el umbral recibe prioridad alta e incluye:
-
-- Identificador de la regla.
-- Número de fallos relacionados.
-- Ventana de detección.
-- Identificadores de los eventos que justifican la detección.
+Un mismo evento puede cumplir las dos reglas y el panel muestra
+las evidencias de cada una: identificador, técnica MITRE, número de fallos,
+ventana, cuentas distintas (AUTH-002) y eventos relacionados.
 
 Los eventos sin detección tienen prioridad inicial baja.
 
-La regla analiza únicamente los últimos 100 eventos 4625 recogidos
-en cada consulta. No representa una revisión completa del historial.
+Las reglas están en `src/detection/rules.js` y las usan tanto el servicio
+local como la demo. Analizan únicamente los últimos 100 eventos 4625
+recogidos en cada consulta; no representan una revisión completa
+del historial.
 
 ## Estados y datos locales
 
@@ -181,13 +202,16 @@ Para contrastar un evento:
 
 ```text
 server/
-  server.cjs          API local y persistencia de estados
+  server.js           API local y persistencia de estados
   read-events.ps1     Lector de eventos de Windows
-  detect-events.cjs   Regla de detección
 src/
+  detection/
+    rules.js          Reglas de detección (servicio y demo)
+    windowsCodes.js   Traducción de Status, SubStatus y tipo de acceso
   main.jsx            Punto de entrada
   ZaintzaPage.jsx     Panel principal
   InvestigationEditor.jsx  Notas y cierre de la investigación
   data/               Datos ficticios de la demo
   styles/             Estilos del panel
+test/                 Tests con node:test
 ```

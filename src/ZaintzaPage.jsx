@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { severityLabels, statusLabels } from "./data/alerts";
 import { createDemoEvents } from "./data/demoEvents";
+import { describeLogonType, describeStatus } from "./detection/windowsCodes";
 import InvestigationEditor from "./InvestigationEditor";
 import "./styles/zaintza.css";
 
@@ -27,6 +28,26 @@ function formatDate(value) {
         : dateFormatter.format(date);
 }
 
+const recommendations = {
+    "ZAINTZA-AUTH-001":
+        "Revisa los eventos relacionados y verifica si corresponden " +
+        "a una prueba autorizada, una contraseña guardada incorrecta o " +
+        "actividad no reconocida. Comprueba si hubo accesos correctos posteriores.",
+    "ZAINTZA-AUTH-002":
+        "Identifica a quién pertenece la IP de origen y si debe acceder a " +
+        "este equipo. Revisa si alguna de las cuentas probadas inició sesión " +
+        "correctamente después y valora bloquear la IP.",
+};
+
+function getDetections(event) {
+    if (Array.isArray(event.detections)) return event.detections;
+    return event.detection ? [event.detection] : [];
+}
+
+function failureReason(event) {
+    return describeStatus(event.subStatusCode) || describeStatus(event.statusCode);
+}
+
 function toAlert(event, demo = false) {
     const detection = event.detection;
 
@@ -46,9 +67,7 @@ function toAlert(event, demo = false) {
                 : "Windows ha registrado un fallo de inicio de sesión. " +
                 "El evento aislado no confirma un ataque y requiere contexto."),
         recommendation: detection
-            ? "Revisa los eventos relacionados y verifica si corresponden " +
-            "a una prueba autorizada, credenciales mal configuradas o " +
-            "actividad no reconocida. Comprueba si hubo accesos correctos posteriores."
+            ? recommendations[detection.ruleId] || recommendations["ZAINTZA-AUTH-001"]
             : "Comprueba la cuenta, la hora, el tipo de inicio de sesión " +
             "y el proceso asociado.",
     };
@@ -230,7 +249,7 @@ function ZaintzaConsole({ demo }) {
                 alert.id,
                 alert.title,
                 alert.eventId,
-                alert.detection?.ruleId,
+                ...getDetections(alert).flatMap((item) => [item.ruleId, item.mitre?.id]),
                 ...(privacy ? [] : [alert.asset, alert.username, alert.sourceIp]),
             ]
                 .join(" ")
@@ -736,11 +755,16 @@ function ZaintzaConsole({ demo }) {
                                 <Fact label="IP de origen">{sensitiveValue(selectedAlert.sourceIp)}</Fact>
                                 <Fact label="Tipo de acceso">
                                     {displayValue(selectedAlert.logonType)}
+                                    {describeLogonType(selectedAlert.logonType) &&
+                                        ` · ${describeLogonType(selectedAlert.logonType)}`}
                                 </Fact>
                                 <Fact label="EventID">{selectedAlert.eventId}</Fact>
                                 <Fact label="RecordId">{selectedAlert.recordId}</Fact>
                                 <Fact label="Fecha · Euskadi">
                                     {formatDate(selectedAlert.timestamp)}
+                                </Fact>
+                                <Fact label="Motivo del fallo">
+                                    {failureReason(selectedAlert) || "No disponible"}
                                 </Fact>
                                 <Fact label="Estado / subestado">
                                     {displayValue(selectedAlert.statusCode)}
@@ -757,32 +781,50 @@ function ZaintzaConsole({ demo }) {
                                 <p>{selectedAlert.description}</p>
                             </section>
 
-                            {selectedAlert.detection && (
-                                <section className="z-evidence">
-                                    <h4>Evidencias de detección{demo ? " · simuladas" : ""}</h4>
+                            {getDetections(selectedAlert).map((detection) => (
+                                <section className="z-evidence" key={detection.ruleId}>
+                                    <h4>
+                                        {detection.title}
+                                        {demo ? " · simulada" : ""}
+                                    </h4>
                                     <dl className="z-facts">
-                                        <Fact label="Regla">{selectedAlert.detection.ruleId}</Fact>
+                                        <Fact label="Regla">{detection.ruleId}</Fact>
+                                        {detection.mitre && (
+                                            <Fact label="MITRE ATT&CK">
+                                                <a
+                                                    href={detection.mitre.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {detection.mitre.id} · {detection.mitre.name}
+                                                </a>
+                                            </Fact>
+                                        )}
                                         <Fact label="Fallos / ventana">
-                                            {selectedAlert.detection.count} en{" "}
-                                            {selectedAlert.detection.windowMinutes} minutos
+                                            {detection.count} en {detection.windowMinutes} minutos
                                         </Fact>
+                                        {detection.accountCount && (
+                                            <Fact label="Cuentas distintas">
+                                                {detection.accountCount}
+                                            </Fact>
+                                        )}
                                     </dl>
 
                                     <details>
                                         <summary>Ver eventos relacionados</summary>
                                         <ul>
-                                            {(selectedAlert.detection.relatedEventIds || []).map(
+                                            {(detection.relatedEventIds || []).map(
                                                 (id) => <li key={id}>{id}</li>
                                             )}
                                         </ul>
                                     </details>
 
                                     <p>
-                                        Agrupados por cuenta, equipo, IP y tipo de acceso.
+                                        Agrupados por {detection.groupedBy || "cuenta, equipo, IP y tipo de acceso"}.
                                         Pueden pertenecer a una misma secuencia.
                                     </p>
                                 </section>
-                            )}
+                            ))}
 
                             <section className="z-recommendation">
                                 <h4>Siguiente paso</h4>

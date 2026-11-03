@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "server": "node server/server.cjs"
+    "server": "node server/server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "express": "^5.1.0",

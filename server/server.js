@@ -1,8 +1,11 @@
-const express = require("express");
-const { execFile } = require("node:child_process");
-const fs = require("node:fs");
-const path = require("node:path");
-const { detectEvents } = require("./detect-events.cjs");
+import express from "express";
+import { execFile } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { detectEvents } from "../src/detection/rules.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const host = "127.0.0.1";
