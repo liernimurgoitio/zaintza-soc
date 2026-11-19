@@ -38,6 +38,14 @@ El panel muestra eventos reales obtenidos del equipo donde se ejecuta
 el servicio. Una detección requiere investigación y no confirma
 por sí sola que se haya producido un ataque.
 
+## Intercambio con Laguntza IT · primera versión
+
+He añadido una exportación revisable de detecciones ficticias para Laguntza IT. En la evidencia de una regla, pulsa **Revisar exportación ficticia**, comprueba el contenido y descarga el JSON. El archivo incluye regla, intervalo, número de fallos y referencias; no incluye cuentas, equipos, IP ni notas. La descarga no modifica la investigación ni crea una incidencia.
+
+En Laguntza, abre **Importar prueba de Zaintza**, selecciona el archivo, revisa el resumen y confirma que es una prueba. Después prepara el formulario y pulsa **Crear incidencia**. Si la referencia ya existe, se abre su incidencia sin modificar el seguimiento. `examples/zaintza-demo-v1.json` contiene un caso reproducible generado a partir de las mismas reglas de la demo.
+
+Esta versión solo acepta el entorno `demo` y el formato v1. La exportación de eventos reales permanece deshabilitada. No es una transferencia automática ni una prueba de autenticidad de un evento. El código está preparado para su entrega; la actualización del alojamiento y de la Raspberry se registra por separado.
+
 ## Arquitectura
 
 ```text

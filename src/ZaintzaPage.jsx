@@ -4,6 +4,7 @@ import { severityLabels, statusLabels } from "./data/alerts";
 import { createDemoEvents } from "./data/demoEvents";
 import { describeLogonType, describeStatus } from "./detection/windowsCodes";
 import InvestigationEditor from "./InvestigationEditor";
+import DetectionExport from "./integration/DetectionExport";
 import "./styles/zaintza.css";
 
 const dateFormatter = new Intl.DateTimeFormat("es-ES", {
@@ -823,6 +824,7 @@ function ZaintzaConsole({ demo }) {
                                         Agrupados por {detection.groupedBy || "cuenta, equipo, IP y tipo de acceso"}.
                                         Pueden pertenecer a una misma secuencia.
                                     </p>
+                                    <DetectionExport key={selectedAlert.id + detection.ruleId} event={selectedAlert} detection={detection} events={alerts} demo={demo} />
                                 </section>
                             ))}
 

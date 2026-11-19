@@ -1,0 +1,21 @@
+{
+  "format": "zaintza-laguntza",
+  "version": 1,
+  "environment": "demo",
+  "sourceInstanceId": "zaintza-demo-v1",
+  "detection": {
+    "id": "ZAINTZA-AUTH-001:DEMO-4625-1006",
+    "ruleId": "ZAINTZA-AUTH-001",
+    "firstSeen": "2026-09-15T08:00:00.000Z",
+    "lastSeen": "2026-09-15T08:02:30.000Z",
+    "eventCount": 6,
+    "evidenceRefs": [
+      "DEMO-4625-1001",
+      "DEMO-4625-1002",
+      "DEMO-4625-1003",
+      "DEMO-4625-1004",
+      "DEMO-4625-1005",
+      "DEMO-4625-1006"
+    ]
+  }
+}
