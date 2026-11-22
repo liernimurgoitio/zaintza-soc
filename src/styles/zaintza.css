@@ -681,3 +681,5 @@
   font-size: 0.75rem;
 }
 .z-export{margin-top:20px;padding:18px;border:1px solid #35516b;border-radius:10px;background:#102033}.z-export p{line-height:1.65}.z-export button{padding:10px 14px;border:1px solid #5d819e;border-radius:7px;background:#19354e;color:#e4f5ff;cursor:pointer}.z-export button:focus-visible{outline:3px solid #70dbc5;outline-offset:3px}.z-export details{margin:14px 0}
+
+.zaintza .z-table tbody tr{cursor:pointer}.zaintza .z-table tbody tr:focus-within{outline:2px solid var(--z-accent);outline-offset:-2px}

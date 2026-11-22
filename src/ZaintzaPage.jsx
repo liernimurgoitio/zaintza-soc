@@ -608,7 +608,7 @@ function ZaintzaConsole({ demo }) {
                         <table className="z-table">
                             <caption className="z-sr-only">
                                 {demo ? "Eventos ficticios. " : ""}
-                                Pulsa un identificador para ver el detalle.
+                                Pulsa una fila o su identificador para ver el detalle.
                             </caption>
                             <thead>
                                 <tr>
@@ -624,6 +624,10 @@ function ZaintzaConsole({ demo }) {
                                     <tr
                                         key={alert.id}
                                         className={selectedAlert?.id === alert.id ? "is-selected" : ""}
+                                        onClick={(event) => {
+                                            if (event.target.closest("button, a, input, select, textarea")) return;
+                                            setSelectedId(alert.id);
+                                        }}
                                     >
                                         <td>
                                             <button
